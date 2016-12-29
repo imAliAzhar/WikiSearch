@@ -7,7 +7,6 @@ def create_project_dir(directory):
         print('Creating directory ' + directory)
         os.makedirs(directory)
 
-
 # Create queue and crawled files (if not created)
 def create_data_files(project_name, base_url):
     queue = os.path.join(project_name , 'queue.txt')
@@ -22,7 +21,6 @@ def create_data_files(project_name, base_url):
 def write_file(path, data):
     with open(path, 'w') as f:
         f.write(data)
-
 
 # Add data onto an existing file
 def append_to_file(path, data):
