@@ -9,6 +9,9 @@
 #include <stack>
 #include <fstream>
 #include <regex>
+#include <cstdlib>
+#include <windows.h>
+
 
  #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
@@ -29,11 +32,14 @@ int tagposition = 0;
 
 vector<Word> v;
 
-ofstream file("webpage.txt");
+string outputFilePath;
+ofstream outputFile;
 
 int tagPos = 0;
 
 int wordPos = 0;
+
+
 
 %}
 
@@ -59,36 +65,75 @@ IGNORETAG \<.*\/>
 <AHREFSTARTED>{URL} { BEGIN(TAGSTARTED); }
 <TAGSTARTED>{WORD}  { }
 <TAGSTARTED>{CTAG}  { BEGIN(TAGCONTENT); }
-<TAGCONTENT>{WORD}  { file << yytext << "\t\t\t" << sTags.top() << "\t" << wordPos << " " <<  tagPos << "\n"; wordPos++; }
+<TAGCONTENT>{WORD}  { outputFile << yytext << "\t\t\t" << sTags.top() << "\t" << wordPos << " " <<  tagPos << "\n"; wordPos++; }
 <TAGCONTENT>{ETAG}  { BEGIN(ETAGSTARTED); wordPos = 0; tagPos++; }
 <ETAGSTARTED>{WORD} {  }
 <ETAGSTARTED>{CTAG} { if(!sTags.empty()) sTags.pop(); BEGIN(TAGCONTENT); }
 
 %%
 
+int
+yyparse (char const *file)
+{
+  yyin = fopen (file, "r");
+  if (!yyin)
+    {
+      perror ("fopen");
+      exit (EXIT_FAILURE);
+    }
+  /* One token only.  */
+  yylex ();
+  if (fclose (yyin) != 0)
+    {
+      perror ("fclose");
+      exit (EXIT_FAILURE);
+    }
+  return 0;
+}
+
 int main()
 {
-	yyin = fopen("text.txt", "r");
+	string path = "C:\\linux\\crawled\\";
+	string searchPattern = "*.txt";
+	string fullSearchPath = path + searchPattern;
 
-	FILE *f = NULL;
+	WIN32_FIND_DATA FindData;
+	HANDLE hFind;
 
-	yyout = f;
-	yylex();
+	hFind = FindFirstFile(fullSearchPath.c_str(), &FindData);
 
-	//system("cls");
-	//std::cout << title;
-
-	cout << endl;
-
-	/*
-	for(int i = 0; i < v.size(); i++)
+	if (hFind == INVALID_HANDLE_VALUE)
 	{
-		cout << v[i].literal << "\t\t" << v[i].literalpositon << endl;
+		cout << "Error searching directory\n";
+		_getch();
+		return -1;
 	}
-	Word temp; temp.literal = yytext; temp.literalpositon = 0;  v.push_back(temp); */
+
+	do
+	{
+		string filePath = path + FindData.cFileName;
+		string outputFilePathDir = "C:\\linux\\parsed\\";
+
+		outputFilePath = outputFilePathDir + FindData.cFileName;
+		outputFile.open(outputFilePath.c_str());
+
+		//yyin = fopen(filePath.c_str(), "r");
+		//FILE *f = NULL;
+		//yyout = f;
+		//yylex();
+
+		yyparse(filePath.c_str());
+
+		outputFile.close();
+
+		
+	} while (FindNextFile(hFind, &FindData) > 0);
+
+	if (GetLastError() != ERROR_NO_MORE_FILES)
+	{
+		cout << "Something went wrong during searching\n";
+	}
+
 	_getch();
 	return 0;
-
-	// file << yytext << endl;
-
 }
