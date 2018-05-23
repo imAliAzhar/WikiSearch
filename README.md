@@ -1,4 +1,6 @@
 # Search-Engine-Project
+[ Repository made public ]
+
 Hello peeps
 We are going to work on our Project on GitHub.
 Search-Engine-Project is a private repository. Only those can view/edit who have been granted access.
@@ -11,11 +13,10 @@ Done.
 Parses a page in O(n) :D
 Done.
 
-Third milestone: Indexer
-Work in progress.
+~~Third milestone: Indexer
+Work in progress.~~ Done.
 
-
-http://www.boyter.org/2013/01/code-for-a-search-engine-in-php-part-1/
+~~Fourth Milestone: Page Rank algorithm.~~ Done.
 
 ---
 
