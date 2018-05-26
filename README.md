@@ -1,4 +1,4 @@
-# Search-Engine-Project
+# WikiSearch
 [ Repository made public ]
 
 Hello peeps
